@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#22332e">
+  <title>泥与水之间 · 网页版</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%2322312b'/%3E%3Ctext x='32' y='43' font-size='36' text-anchor='middle' fill='%23fffdf8'%3E泥%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./src/styles.css?v=0.14.6">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">泥</span>
+      <div>
+        <h1>泥与水之间</h1>
+        <p>这是一个策略文字游戏，模拟晚更新世末到全新世早期、生存在长江中下游的古人类生活图景。你需要带领一个二十多人的地方群体，在低丘、河湾、湖沼和河口之间生活，争取形成能够跨代维持的生活方式。</p>
+      </div>
+    </div>
+    <div class="meta-strip" id="metaStrip"></div>
+    <div class="top-actions">
+      <button class="icon-button" id="saveButton" type="button" title="保存">保存</button>
+      <button class="icon-button" id="exportButton" type="button" title="导出进度">导出</button>
+      <button class="icon-button" id="importButton" type="button" title="导入进度">导入</button>
+      <button class="icon-button" id="newGameButton" type="button">新局</button>
+      <button class="icon-button ending-achievements-button" id="endingAchievementsButton" type="button" aria-haspopup="dialog">结局成就</button>
+      <input id="importFile" type="file" accept="application/json,.json" hidden>
+    </div>
+  </header>
+
+  <main class="game-layout">
+    <section class="story-column">
+      <div class="scene-header" id="sceneHeader"></div>
+      <section class="persistent-status" id="persistentStatus"></section>
+      <article class="wizard-card" id="wizardCard" aria-live="polite"></article>
+      <details class="rules-details">
+        <summary>基本规则</summary>
+        <div class="rule-grid">
+          <p class="rule-copy">人物年龄每季+1.25岁；每个季节先处理季节事件，再决定是否迁徙，随后可自由选择行动卡；行动卡不保证100%成功率；意外事件会概率出现在任一季节；食物消耗与人口数量相关但最低消耗为1点。</p>
+        </div>
+      </details>
+    </section>
+
+    <aside class="side-column">
+      <nav class="side-tabs" id="sideTabs" aria-label="状态面板">
+        <button type="button" class="active" data-side-tab="log">记录</button>
+        <button type="button" data-side-tab="knowledge">知识</button>
+        <button type="button" data-side-tab="people">人物</button>
+        <button type="button" data-side-tab="route">路线见证</button>
+      </nav>
+      <section class="side-panel" id="sidePanel"></section>
+    </aside>
+  </main>
+
+  <footer class="statusbar">
+    <span id="saveState">本地自动存档</span>
+    <span id="seedLabel"></span>
+    <span>v0.14.6 · TypeScript rules 1.0</span>
+  </footer>
+
+  <dialog id="endingAchievementsDialog" class="dialog ending-achievements-dialog" aria-labelledby="endingAchievementsTitle">
+    <div class="dialog-card ending-achievements-shell">
+      <div class="dialog-title ending-achievements-heading">
+        <div>
+          <p class="eyebrow">Ending archive</p>
+          <h2 id="endingAchievementsTitle">结局成就</h2>
+          <p class="ending-achievements-intro">所有结局都在这里列出。未达成的结局也会公开名称与完整条件，达成记录保存在当前浏览器。</p>
+        </div>
+        <button class="close-button" id="closeEndingAchievements" type="button" aria-label="关闭">×</button>
+      </div>
+      <section class="ending-achievements-overview" aria-label="结局成就进度">
+        <div class="ending-achievements-overview-copy">
+          <strong id="endingAchievementCount">已达成 0 / 0</strong>
+          <span id="endingAchievementSummary"></span>
+        </div>
+        <div class="ending-achievements-progress" role="progressbar" aria-label="结局成就完成度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <i id="endingAchievementProgress"></i>
+        </div>
+      </section>
+      <section class="ending-achievement-grid" id="endingAchievementGrid" aria-live="polite"></section>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./dist/app.js?v=0.14.6"></script>
+</body>
+</html>
