@@ -161,7 +161,7 @@ const ACTION_DEFINITIONS = [
         cost: "材料 1，不足则食物 1",
         conditions: "任意季节；任意地点",
         outcomes: "成功网+1并获材料；部分仅完成试探；受阻凝-1",
-        bonus: "翻译提供修正；完整故事 +1；网络达到 3 后可提议联盟",
+        bonus: "族际中间人提供修正；完整故事 +1；网络达到 3 后可提议联盟",
         knowledge: "story"
     },
     {
@@ -756,7 +756,7 @@ export class MudWaterGame {
             this.state.caregiverId = this.pick(valid, "重抽主要照护者");
         }
         if (this.state.translatorId === null || !this.person(this.state.translatorId)) {
-            this.state.translatorId = this.pick(valid, "重抽翻译");
+            this.state.translatorId = this.pick(valid, "重抽族际中间人");
         }
     }
     learnFromEvent(key, source) {
@@ -3270,7 +3270,7 @@ export class MudWaterGame {
                 this.state.birthCounts[birthKey] = (this.state.birthCounts[birthKey] ?? 0) + 1;
                 pregnant.add(female.id);
                 conceived += 1;
-                this.log("settlement", "受孕", `${female.name}与${male.name}孕育了新生命，她将在本季末分娩。`);
+                this.log("settlement", "即将迎接新生命", `${female.name}与${male.name}孕育了新生命，她将在本季末分娩。`);
             }
         }
         this.state.postpartumIds = [

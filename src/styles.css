@@ -399,6 +399,45 @@ select, input {
 .dialog-card label { display: grid; gap: 5px; color: var(--muted); font: 12px "Microsoft YaHei", sans-serif; }
 .dialog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.game-guide-dialog {
+  width: min(680px, calc(100vw - 28px));
+  max-height: calc(100vh - 28px);
+  overflow: auto;
+}
+.game-guide-shell {
+  display: grid;
+  gap: 18px;
+  padding: clamp(20px, 4vw, 30px);
+}
+.game-guide-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+.game-guide-heading h2 {
+  margin-top: 3px;
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.2;
+}
+.game-guide-copy {
+  display: grid;
+  gap: 13px;
+  padding: 17px 18px;
+  border: 1px solid #c7d6cc;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #edf3ea, #f8f3e8);
+  color: var(--ink-soft);
+  font-size: 15px;
+  line-height: 1.8;
+}
+.game-guide-copy p:last-child {
+  padding-top: 13px;
+  border-top: 1px solid rgb(87 116 95 / 18%);
+}
+.game-guide-shell .dialog-actions {
+  margin-top: 0;
+}
 .ending-achievements-dialog {
   width: min(1120px, calc(100vw - 28px));
   max-height: calc(100vh - 28px);
@@ -572,6 +611,9 @@ select, input {
   .migration-grid { grid-template-columns: 1fr; }
   .rule-grid { grid-template-columns: 1fr; }
   .dialog-grid { grid-template-columns: 1fr; }
+  .game-guide-dialog { width: calc(100vw - 16px); max-height: calc(100vh - 16px); }
+  .game-guide-shell { gap: 14px; padding: 18px 16px; }
+  .game-guide-copy { padding: 14px; font-size: 14px; line-height: 1.72; }
   .ending-achievements-dialog { width: calc(100vw - 16px); max-height: calc(100vh - 16px); }
   .ending-achievements-shell { max-height: calc(100vh - 16px); }
   .ending-achievements-heading { padding: 17px 16px 12px; }

@@ -10,6 +10,7 @@ const sideTabs = document.querySelector("#sideTabs");
 const saveState = document.querySelector("#saveState");
 const seedLabel = document.querySelector("#seedLabel");
 const toastElement = document.querySelector("#toast");
+const gameGuideDialog = document.querySelector("#gameGuideDialog");
 const endingAchievementsDialog = document.querySelector("#endingAchievementsDialog");
 const endingAchievementGrid = document.querySelector("#endingAchievementGrid");
 const endingAchievementCount = document.querySelector("#endingAchievementCount");
@@ -71,6 +72,9 @@ function recordCurrentEndingAchievement() {
         unlockedAt: new Date().toISOString()
     });
     persistEndingAchievements();
+}
+function openGameGuide() {
+    if (!gameGuideDialog.open) gameGuideDialog.showModal();
 }
 function openEndingAchievements() {
     recordCurrentEndingAchievement();
@@ -202,7 +206,7 @@ function renderHeader() {
     <span class="meta-chip">${SEASON_LABELS[game.season]}</span>
     <span class="meta-chip">${escapeHtml(game.state.camp)}</span>
     <span class="meta-chip">人口 ${population}</span>
-    <span class="meta-chip">孕期 ${pregnant}</span>
+    <span class="meta-chip">孕产妇 ${pregnant}</span>
   `;
     seedLabel.textContent = `seed ${game.state.seed}`;
     sceneHeader.innerHTML = `
@@ -575,7 +579,7 @@ function renderPeople() {
             ${person.heavyInjury ? `<span class="tag">重伤</span>` : ""}
             ${person.spouseId ? `<span class="tag">配偶：${escapeHtml(game.peopleName(person.spouseId))}</span>` : ""}
             ${person.id === game.state.caregiverId ? `<span class="tag">照护者</span>` : ""}
-            ${person.id === game.state.translatorId ? `<span class="tag">翻译</span>` : ""}
+            ${person.id === game.state.translatorId ? `<span class="tag">族际中间人</span>` : ""}
           </div>
         </div>
       `).join("")}
@@ -690,7 +694,8 @@ function startRandomNewGame() {
     activeSideTab = "log";
     saveGame();
     render();
-    toast(`随机新局开始 · seed ${seed} · 照护者 ${game.peopleName(caregiverId)} · 翻译 ${game.peopleName(translatorId)}`);
+    toast(`随机新局开始 · seed ${seed} · 照护者 ${game.peopleName(caregiverId)} · 族际中间人 ${game.peopleName(translatorId)}`);
+    openGameGuide();
 }
 document.addEventListener("click", (event)=>{
     const target = event.target;
@@ -739,6 +744,11 @@ document.querySelector("#saveButton").addEventListener("click", ()=>saveGame(tru
 document.querySelector("#exportButton").addEventListener("click", exportGame);
 document.querySelector("#newGameButton").addEventListener("click", startRandomNewGame);
 document.querySelector("#endingAchievementsButton").addEventListener("click", openEndingAchievements);
+document.querySelector("#closeGameGuide").addEventListener("click", ()=>gameGuideDialog.close());
+document.querySelector("#startGameGuide").addEventListener("click", ()=>gameGuideDialog.close());
+gameGuideDialog.addEventListener("click", (event)=>{
+    if (event.target === gameGuideDialog) gameGuideDialog.close();
+});
 document.querySelector("#importButton").addEventListener("click", ()=>{
     document.querySelector("#importFile").click();
 });
@@ -767,6 +777,7 @@ endingAchievementsDialog.addEventListener("click", (event)=>{
 saveState.textContent = "本地自动存档";
 recordCurrentEndingAchievement();
 render();
+openGameGuide();
 
 
 //# sourceURL=D:\Applications\CodexData\脑洞\web-game\src\app.ts

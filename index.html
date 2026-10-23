@@ -15,7 +15,7 @@
       <span class="brand-mark">泥</span>
       <div>
         <h1>泥与水之间</h1>
-        <p>这是一个策略文字游戏，模拟晚更新世末到全新世早期、生存在长江中下游的古人类生活图景。你需要带领一个二十多人的地方群体，在低丘、河湾、湖沼和河口之间生活，争取形成能够跨代维持的生活方式。</p>
+        <p>这是一个策略向文字游戏，模拟晚更新世末到全新世早期、生存在长江中下游的古人类生活图景。</p>
       </div>
     </div>
     <div class="meta-strip" id="metaStrip"></div>
@@ -58,6 +58,25 @@
     <span id="seedLabel"></span>
     <span>v0.14.6 · TypeScript rules 1.0</span>
   </footer>
+
+  <dialog id="gameGuideDialog" class="dialog game-guide-dialog" aria-labelledby="gameGuideTitle" aria-describedby="gameGuideCopy">
+    <div class="dialog-card game-guide-shell">
+      <div class="game-guide-heading">
+        <div>
+          <p class="eyebrow">1.17 万年前 · 长江下游</p>
+          <h2 id="gameGuideTitle">生存指引</h2>
+        </div>
+        <button class="close-button" id="closeGameGuide" type="button" aria-label="关闭指引">×</button>
+      </div>
+      <div class="game-guide-copy" id="gameGuideCopy">
+        <p>现在是1.17 万年前，末次冰期，你将带领一个 24 人的长江下游地方群体，在低丘、橡林、河湾、湖沼和河口之间生活。每局由“代”组成，每代有春水、盛夏、秋收、冬寒四季；每季结束时所有在世人物年龄增加 1.25 岁，所以一代约等于 5 年。</p>
+        <p>你要在有限行动中维持生活，并把知识、人口、储藏、住所和对外关系留给下一代。游戏从第 6 代冬寒季结算后开始正式判定 HE 或路线结局（生存结局可以在更早时发生）。</p>
+      </div>
+      <div class="dialog-actions">
+        <button class="button primary" id="startGameGuide" type="button">进入游戏</button>
+      </div>
+    </div>
+  </dialog>
 
   <dialog id="endingAchievementsDialog" class="dialog ending-achievements-dialog" aria-labelledby="endingAchievementsTitle">
     <div class="dialog-card ending-achievements-shell">
