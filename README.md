@@ -3,7 +3,7 @@
 
 网页版：https://mud-and-water-web.chiulainn.workers.dev/
 
-目前（v0.14.6）只把主体做出来了，新手指引/新手教程还没生出来...
+开局即可看到简单新手指引
 
 遇到bug或者有需要修改的地方可以联系我 :)
 
