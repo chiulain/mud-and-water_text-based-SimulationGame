@@ -78,6 +78,64 @@ a { color: inherit; }
   font: 12px "Microsoft YaHei", sans-serif;
   white-space: nowrap;
 }
+.meta-chip-button {
+  appearance: none;
+  cursor: pointer;
+  color: #fff7e8;
+}
+.meta-chip-button:hover {
+  border-color: rgb(240 223 200 / 60%);
+  background: rgb(240 223 200 / 18%);
+}
+.meta-chip-button:focus-visible {
+  outline: 2px solid #f0dfc8;
+  outline-offset: 2px;
+}
+.relationship-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-color: rgb(240 223 200 / 44%);
+  background: linear-gradient(135deg, rgb(240 223 200 / 16%), rgb(255 255 255 / 6%));
+}
+.relationship-trigger-icon {
+  position: relative;
+  display: inline-block;
+  width: 21px;
+  height: 11px;
+}
+.relationship-trigger-icon::before,
+.relationship-trigger-icon::after {
+  content: "";
+  position: absolute;
+  height: 1px;
+  background: rgb(255 247 232 / 60%);
+  transform-origin: left center;
+}
+.relationship-trigger-icon::before {
+  left: 4px;
+  top: 6px;
+  width: 10px;
+  transform: rotate(-24deg);
+}
+.relationship-trigger-icon::after {
+  left: 11px;
+  top: 3px;
+  width: 8px;
+  transform: rotate(30deg);
+}
+.relationship-trigger-icon i {
+  position: absolute;
+  z-index: 1;
+  width: 5px;
+  height: 5px;
+  border: 1px solid #fff7e8;
+  border-radius: 50%;
+  background: #536e62;
+}
+.relationship-trigger-icon i:nth-child(1) { left: 0; top: 4px; }
+.relationship-trigger-icon i:nth-child(2) { left: 8px; top: 0; }
+.relationship-trigger-icon i:nth-child(3) { left: 15px; top: 5px; }
 .top-actions { display: flex; gap: 5px; }
 .icon-button {
   border: 1px solid rgb(255 255 255 / 22%);
@@ -122,8 +180,10 @@ a { color: inherit; }
   background: rgb(255 253 248 / 88%);
 }
 .compact-resource span { display: block; overflow: hidden; color: var(--muted); font: 10px "Microsoft YaHei", sans-serif; text-overflow: ellipsis; white-space: nowrap; }
-.compact-resource strong { display: block; font-size: 19px; line-height: 1.2; }
+.compact-resource strong { display: block; overflow: hidden; font-size: 19px; line-height: 1.2; text-overflow: clip; white-space: nowrap; }
+.compact-resource .resource-cap { display: inline; color: #687970; font-size: .68em; font-weight: 500; letter-spacing: -.02em; white-space: nowrap; }
 .compact-resource.low strong { color: var(--danger); }
+.compact-resource.low .resource-cap { color: inherit; opacity: .78; }
 .trend-banner {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -399,6 +459,336 @@ select, input {
 .dialog-card label { display: grid; gap: 5px; color: var(--muted); font: 12px "Microsoft YaHei", sans-serif; }
 .dialog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.relationship-dialog {
+  width: min(1180px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow: hidden;
+}
+.relationship-shell {
+  display: grid;
+  grid-template-rows: auto auto minmax(280px, 1fr) auto;
+  height: min(88vh, 900px);
+  max-height: calc(100vh - 24px);
+  padding: 0;
+  background: #f8f5ed;
+}
+.relationship-heading {
+  margin: 0;
+  padding: 20px 22px 14px;
+  border-bottom: 1px solid #d8dfd8;
+  background: linear-gradient(135deg, #fffdf8, #edf2ec);
+}
+.relationship-heading h2 {
+  margin-top: 2px;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.15;
+}
+.relationship-title-hint {
+  display: inline-block;
+  margin-left: 10px;
+  color: #7c8b83;
+  font: 400 12px/1.4 "Microsoft YaHei", sans-serif;
+  letter-spacing: 0;
+  vertical-align: middle;
+}
+.relationship-summary {
+  margin-top: 6px;
+  color: var(--muted);
+  font: 12px/1.6 "Microsoft YaHei", sans-serif;
+}
+.relationship-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 22px;
+  border-bottom: 1px solid #d8dfd8;
+  background: #fffdf8;
+}
+.relationship-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 15px;
+  color: #5d6d65;
+  font: 11px "Microsoft YaHei", sans-serif;
+}
+.relationship-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.legend-line {
+  display: inline-block;
+  width: 27px;
+  height: 0;
+  border-top: 2px solid #718a7a;
+}
+.legend-line.ancestry {
+  height: 3px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4f7b68, #b36d4d, #55789a, #a27c3e);
+}
+.legend-line.spouse {
+  border-top: 3px double #b1815c;
+}
+.legend-node {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 1px solid #adbbb1;
+  border-radius: 4px;
+  background: #fff;
+}
+.legend-node.anchor {
+  border-style: dashed;
+  background: #eef0ed;
+}
+.legend-node.pregnant {
+  border: 2px solid #c88944;
+  background: #fff9f0;
+}
+.relationship-zoom {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+}
+.relationship-zoom button {
+  min-width: 31px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid #cbd6ce;
+  border-radius: 8px;
+  color: #34483e;
+  background: #fffdf8;
+  font: 14px "Microsoft YaHei", sans-serif;
+}
+.relationship-zoom button:hover {
+  border-color: #8fa595;
+  background: #eef4ee;
+}
+.relationship-zoom button:focus-visible {
+  outline: 2px solid #7f9b89;
+  outline-offset: 1px;
+}
+.relationship-zoom #relationshipZoomValue {
+  min-width: 45px;
+  color: var(--muted);
+  text-align: center;
+  font: 11px "Microsoft YaHei", sans-serif;
+}
+.relationship-zoom .relationship-fit {
+  min-width: 48px;
+  margin-left: 3px;
+  font-size: 11px;
+}
+.relationship-zoom .relationship-clear {
+  min-width: 62px;
+  margin-right: 4px;
+  border-color: #aebdaf;
+  background: #edf3ed;
+  font-size: 10px;
+}
+.relationship-viewport {
+  min-height: 0;
+  margin: 12px 22px 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid #cbd8ce;
+  border-radius: 16px;
+  background-color: #f3f0e7;
+  background-image:
+    radial-gradient(circle at 18% 22%, rgb(255 255 255 / 78%), transparent 31%),
+    radial-gradient(circle at 82% 70%, rgb(225 235 226 / 72%), transparent 34%),
+    radial-gradient(rgb(97 119 103 / 12%) 0.7px, transparent 0.7px);
+  background-size: auto, auto, 18px 18px;
+  cursor: grab;
+  scrollbar-color: #9aaa9f #ebe7dc;
+}
+.relationship-viewport.is-dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+.relationship-viewport.is-dragging .relationship-svg {
+  pointer-events: none;
+}
+.relationship-graph {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 100%;
+  padding: 20px;
+}
+.relationship-svg {
+  display: block;
+  max-width: none;
+  height: auto;
+  overflow: visible;
+}
+.relationship-family-panel {
+  fill: rgb(255 253 248 / 92%);
+  stroke: #d2dbd3;
+  stroke-width: 1.2;
+}
+.relationship-family-title {
+  fill: #52675a;
+  font: 700 11px "Microsoft YaHei", sans-serif;
+  letter-spacing: .09em;
+}
+.relationship-family-meta {
+  fill: #89968d;
+  font: 10px "Microsoft YaHei", sans-serif;
+}
+.relationship-family.is-background > .relationship-family-panel,
+.relationship-family.is-background > .relationship-family-title,
+.relationship-family.is-background > .relationship-family-meta {
+  opacity: .28;
+  filter: blur(.7px);
+}
+.relationship-edge {
+  fill: none;
+  pointer-events: none;
+}
+.ancestry-bus {
+  stroke: #a8b6ac;
+  stroke-width: 1.6;
+  opacity: .72;
+}
+.ancestry-edge {
+  stroke-width: 1.9;
+  opacity: .82;
+}
+.ancestry-color-0 { stroke: #4f7b68; }
+.ancestry-color-1 { stroke: #b36d4d; }
+.ancestry-color-2 { stroke: #55789a; }
+.ancestry-color-3 { stroke: #a27c3e; }
+.ancestry-color-4 { stroke: #806a99; }
+.ancestry-color-5 { stroke: #43878a; }
+.ancestry-color-6 { stroke: #a45d72; }
+.ancestry-color-7 { stroke: #708348; }
+.ancestry-color-8 { stroke: #6d739f; }
+.ancestry-color-9 { stroke: #9c6d42; }
+.ancestry-color-10 { stroke: #4f7d94; }
+.ancestry-color-11 { stroke: #7d6847; }
+.ancestry-edge.is-focused-edge,
+.ancestry-bus.is-focused-edge {
+  opacity: 1;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 1px 2px rgb(45 70 56 / 18%));
+}
+.ancestry-edge.is-background-edge,
+.ancestry-bus.is-background-edge {
+  opacity: .12;
+  filter: blur(1.1px);
+}
+.spouse-edge-outer {
+  stroke: #b1815c;
+  stroke-width: 6;
+  opacity: .78;
+}
+.spouse-edge-core {
+  stroke: #f8f3e8;
+  stroke-width: 2.4;
+}
+.spouse-edge-outer.is-focused-edge { opacity: 1; stroke-width: 7; }
+.spouse-edge-core.is-focused-edge { opacity: 1; }
+.spouse-edge-outer.is-background-edge,
+.spouse-edge-core.is-background-edge {
+  opacity: .1;
+  filter: blur(1.2px);
+}
+.relationship-node { outline: none; cursor: pointer; }
+.relationship-node-card {
+  fill: #fffdf8;
+  stroke: #bfcfc3;
+  stroke-width: 1.4;
+  transition: stroke .15s ease, stroke-width .15s ease, filter .15s ease;
+}
+.relationship-node.is-female .relationship-node-card { fill: #fff9f4; }
+.relationship-node.is-male .relationship-node-card { fill: #f6fbf7; }
+.relationship-node.is-anchor .relationship-node-card {
+  fill: #eef0ed;
+  stroke-dasharray: 5 4;
+}
+.relationship-node.is-pregnant .relationship-node-card {
+  stroke: #c88944;
+  stroke-width: 2.4;
+}
+.relationship-node:hover .relationship-node-card,
+.relationship-node:focus-visible .relationship-node-card {
+  stroke: #506f5c;
+  stroke-width: 2.6;
+  filter: drop-shadow(0 4px 7px rgb(45 70 56 / 14%));
+}
+.relationship-node.is-pregnant:hover .relationship-node-card,
+.relationship-node.is-pregnant:focus-visible .relationship-node-card {
+  stroke: #b67731;
+}
+.relationship-node.is-related .relationship-node-card {
+  stroke: #769282;
+  stroke-width: 2.1;
+}
+.relationship-node.is-selected .relationship-node-card {
+  stroke: #264f40;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 10px rgb(48 94 73 / 30%));
+}
+.relationship-node.is-background {
+  opacity: .18;
+  filter: blur(1.25px);
+}
+.relationship-node.is-background:hover,
+.relationship-node.is-background:focus-visible {
+  opacity: .55;
+  filter: blur(.45px);
+}
+.relationship-sex-dot { stroke: #fff; stroke-width: 1.2; }
+.relationship-node.is-male .relationship-sex-dot { fill: #557a68; }
+.relationship-node.is-female .relationship-sex-dot { fill: #bd785c; }
+.relationship-node.is-anchor .relationship-sex-dot { fill: #9ca49f; }
+.relationship-node-name {
+  fill: #293c32;
+  font: 700 20px "Songti SC", "STSong", "Microsoft YaHei", serif;
+}
+.relationship-node-age {
+  fill: #687970;
+  font: 10px "Microsoft YaHei", sans-serif;
+}
+.relationship-node-role {
+  fill: #42564b;
+  font: 10px "Microsoft YaHei", sans-serif;
+}
+.relationship-node.is-knowledge-holder .relationship-node-role {
+  fill: #8a5d27;
+  font-weight: 700;
+}
+.relationship-node.is-knowledge-heir .relationship-node-role {
+  fill: #3e6678;
+  font-weight: 700;
+}
+.relationship-node-status {
+  fill: #87938c;
+  font: 9px "Microsoft YaHei", sans-serif;
+}
+.relationship-node-marker {
+  fill: #5f7567;
+  font: 700 9px "Microsoft YaHei", sans-serif;
+}
+.relationship-node-marker.pregnant { fill: #ad6e2e; }
+.relationship-footnote {
+  margin: 0;
+  padding: 9px 22px 13px;
+  color: #77857d;
+  font: 10px/1.5 "Microsoft YaHei", sans-serif;
+}
+.relationship-empty {
+  margin: auto;
+  padding: 28px;
+  color: var(--muted);
+  text-align: center;
+}
 .game-guide-dialog {
   width: min(680px, calc(100vw - 28px));
   max-height: calc(100vh - 28px);
@@ -591,6 +981,11 @@ select, input {
   .side-panel { max-height: none; min-height: 380px; }
   .action-grid { grid-template-columns: 1fr 1fr; }
   .ending-achievement-grid { grid-template-columns: 1fr; }
+  .relationship-dialog {
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+  }
+  .relationship-shell { max-height: calc(100vh - 16px); }
 }
 
 @media (max-width: 520px) {
@@ -622,5 +1017,83 @@ select, input {
   .ending-achievements-overview-copy span { text-align: left; }
   .ending-achievement-grid { padding: 0 16px 16px; }
   .ending-achievement-card { min-height: 0; padding: 12px; }
+  .relationship-heading { padding: 16px 14px 12px; }
+  .relationship-title-hint {
+    display: block;
+    margin: 4px 0 0;
+    font-size: 11px;
+  }
+  .relationship-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 9px 14px;
+  }
+  .relationship-legend { gap: 6px 11px; }
+  .relationship-zoom { align-self: flex-end; }
+  .relationship-viewport { margin: 9px 10px 0; }
+  .relationship-graph { padding: 12px; }
+  .relationship-footnote { padding: 8px 14px 11px; }
   .statusbar { padding: 0 12px 18px; }
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .relationship-dialog {
+    width: calc(100vw - 8px);
+    max-height: calc(100vh - 8px);
+  }
+  .relationship-shell {
+    grid-template-rows: auto auto minmax(0, 1fr);
+    height: calc(100vh - 8px);
+    max-height: calc(100vh - 8px);
+  }
+  .relationship-heading {
+    display: flex;
+    align-items: center;
+    padding: 7px 10px;
+  }
+  .relationship-heading > div {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+  }
+  .relationship-heading .eyebrow { display: none; }
+  .relationship-heading h2 {
+    flex: 0 0 auto;
+    margin: 0;
+    font-size: 20px;
+  }
+  .relationship-title-hint {
+    margin-left: 7px;
+    font-size: 10px;
+  }
+  .relationship-summary {
+    overflow: hidden;
+    margin: 0;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .relationship-heading .close-button {
+    align-self: center;
+    font-size: 20px;
+  }
+  .relationship-toolbar {
+    align-items: center;
+    flex-direction: row;
+    padding: 4px 10px;
+  }
+  .relationship-legend {
+    gap: 3px 9px;
+    font-size: 10px;
+  }
+  .relationship-zoom button {
+    min-width: 27px;
+    height: 25px;
+    padding: 0 6px;
+  }
+  .relationship-zoom .relationship-fit { min-width: 42px; }
+  .relationship-viewport { margin: 5px 8px 8px; }
+  .relationship-graph { padding: 8px; }
+  .relationship-footnote { display: none; }
 }

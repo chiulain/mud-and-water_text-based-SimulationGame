@@ -276,6 +276,7 @@ export class MudWaterGame {
         }
         for (const person of parsed.people){
             if (typeof person.frailtyChoiceHandled !== "boolean") person.frailtyChoiceHandled = false;
+            if (person.roleLabel === "人员迁入") person.rank = null;
         }
         parsed.logs = (parsed.logs ?? []).filter((entry)=>{
             if (entry.kind === "event" && entry.title === "事件选择") return false;
@@ -689,6 +690,16 @@ export class MudWaterGame {
         }
         return used;
     }
+    compareHeirLongevity(a, b) {
+        const aRemaining = a.deathAge === null ? Number.POSITIVE_INFINITY : Math.max(0, a.deathAge - a.age);
+        const bRemaining = b.deathAge === null ? Number.POSITIVE_INFINITY : Math.max(0, b.deathAge - b.age);
+        if (aRemaining !== bRemaining) {
+            if (aRemaining === Number.POSITIVE_INFINITY) return -1;
+            if (bRemaining === Number.POSITIVE_INFINITY) return 1;
+            return bRemaining - aRemaining;
+        }
+        return a.age - b.age || a.id - b.id;
+    }
     chooseHeirCandidate(key) {
         const card = this.knowledge(key);
         const used = this.usedKnowledgeIds();
@@ -696,7 +707,7 @@ export class MudWaterGame {
         if (candidates.length === 0) return null;
         const adults = candidates.filter((person)=>person.age >= 10 && person.age < 40);
         const pool = adults.length > 0 ? adults : candidates;
-        return this.pick(pool, `${KNOWLEDGE_NAMES[key]}补位传承人`);
+        return pool.slice().sort((a, b)=>this.compareHeirLongevity(a, b))[0] ?? null;
     }
     fillKnowledgeHeirs(card) {
         if (card.lost || card.holderId === null) {
@@ -782,9 +793,12 @@ export class MudWaterGame {
             }
             heirs.sort((a, b)=>{
                 if (b.level !== a.level) return b.level - a.level;
-                const aAdult = (this.person(a.id)?.age ?? 0) >= 10 ? 1 : 0;
-                const bAdult = (this.person(b.id)?.age ?? 0) >= 10 ? 1 : 0;
-                return bAdult - aAdult || a.id - b.id;
+                const aPerson = this.person(a.id);
+                const bPerson = this.person(b.id);
+                if (!aPerson || !bPerson) return a.id - b.id;
+                const aAdult = aPerson.age >= 10 ? 1 : 0;
+                const bAdult = bPerson.age >= 10 ? 1 : 0;
+                return bAdult - aAdult || this.compareHeirLongevity(aPerson, bPerson);
             });
             const promoted = heirs[0];
             card.holderId = promoted.id;
@@ -860,7 +874,7 @@ export class MudWaterGame {
             name,
             sex,
             age,
-            rank: 3,
+            rank: null,
             fatherId: null,
             motherId: null,
             spouseId: null,
@@ -3061,9 +3075,12 @@ export class MudWaterGame {
                     level: card.heirLevels[index]
                 })).filter((entry)=>entry.id !== null && this.person(entry.id)).sort((a, b)=>{
                 if (b.level !== a.level) return b.level - a.level;
-                const aAdult = (this.person(a.id)?.age ?? 0) >= 10 ? 1 : 0;
-                const bAdult = (this.person(b.id)?.age ?? 0) >= 10 ? 1 : 0;
-                return bAdult - aAdult || a.id - b.id;
+                const aPerson = this.person(a.id);
+                const bPerson = this.person(b.id);
+                if (!aPerson || !bPerson) return a.id - b.id;
+                const aAdult = aPerson.age >= 10 ? 1 : 0;
+                const bAdult = bPerson.age >= 10 ? 1 : 0;
+                return bAdult - aAdult || this.compareHeirLongevity(aPerson, bPerson);
             })[0];
             if (!heir) return {
                 ok: false,
@@ -3183,6 +3200,17 @@ export class MudWaterGame {
             message: `保留一半人口后继续；当前人口 ${this.population()}。`
         };
     }
+    childGenerationRank(mother, father) {
+        const parentRanks = [
+            mother.rank,
+            father.rank
+        ].filter((rank)=>rank !== null);
+        return parentRanks.length > 0 ? Math.max(...parentRanks) + 1 : null;
+    }
+    canPairByGeneration(a, b) {
+        if (a.rank === null || b.rank === null) return Math.abs(a.age - b.age) <= 10;
+        return a.rank === b.rank;
+    }
     deliverBirths() {
         const due = this.state.pregnancy.filter((preg)=>preg.dueTurn === this.state.turn && this.person(preg.motherId));
         if (due.length === 0) return {
@@ -3207,7 +3235,7 @@ export class MudWaterGame {
                 name: newName,
                 sex,
                 age: 0,
-                rank: Math.max(mother.rank, father.rank) + 1,
+                rank: this.childGenerationRank(mother, father),
                 fatherId: father.id,
                 motherId: mother.id,
                 spouseId: null,
@@ -3291,7 +3319,7 @@ export class MudWaterGame {
         const used = new Set();
         for (const male of singles.filter((person)=>person.sex === "男").sort((a, b)=>a.id - b.id)){
             if (used.has(male.id)) continue;
-            const female = singles.find((person)=>!used.has(person.id) && person.sex === "女" && person.rank === male.rank && !this.relatedWithinThree(male, person));
+            const female = singles.find((person)=>!used.has(person.id) && person.sex === "女" && this.canPairByGeneration(male, person) && !this.relatedWithinThree(male, person));
             if (female) {
                 male.spouseId = female.id;
                 female.spouseId = male.id;

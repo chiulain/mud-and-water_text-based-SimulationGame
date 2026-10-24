@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#22332e">
   <title>泥与水之间 · 网页版</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%2322312b'/%3E%3Ctext x='32' y='43' font-size='36' text-anchor='middle' fill='%23fffdf8'%3E泥%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./src/styles.css?v=0.14.6">
+  <link rel="stylesheet" href="./src/styles.css?v=0.14.6-r1">
 </head>
 <body>
   <header class="topbar">
@@ -101,7 +101,40 @@
     </div>
   </dialog>
 
+  <dialog id="relationshipDialog" class="dialog relationship-dialog" aria-labelledby="relationshipTitle" aria-describedby="relationshipSummary">
+    <div class="dialog-card relationship-shell">
+      <div class="dialog-title relationship-heading">
+        <div>
+          <p class="eyebrow">Relationship preview · 实时</p>
+          <h2 id="relationshipTitle">人物关系<span class="relationship-title-hint">选中人物可单独显示亲缘关系</span></h2>
+          <p class="relationship-summary" id="relationshipSummary">正在整理本局亲缘关系……</p>
+        </div>
+        <button class="close-button" id="closeRelationshipGraph" type="button" aria-label="关闭人物关系图谱">×</button>
+      </div>
+      <div class="relationship-toolbar">
+        <div class="relationship-legend" aria-label="图谱图例">
+          <span><i class="legend-line ancestry"></i>亲子 · 分色</span>
+          <span><i class="legend-line spouse"></i>配偶</span>
+          <span><i class="legend-node active"></i>在世</span>
+          <span><i class="legend-node anchor"></i>已故谱系</span>
+          <span><i class="legend-node pregnant"></i>孕期</span>
+        </div>
+        <div class="relationship-zoom" aria-label="图谱缩放">
+          <button type="button" id="relationshipClearSelection" class="relationship-clear" hidden>显示全部</button>
+          <button type="button" data-relationship-zoom="out" aria-label="缩小图谱">−</button>
+          <span id="relationshipZoomValue">100%</span>
+          <button type="button" data-relationship-zoom="in" aria-label="放大图谱">＋</button>
+          <button type="button" data-relationship-zoom="fit" class="relationship-fit">整图</button>
+        </div>
+      </div>
+      <div class="relationship-viewport" id="relationshipViewport">
+        <div class="relationship-graph" id="relationshipGraph" aria-live="polite"></div>
+      </div>
+      <p class="relationship-footnote">点击人物可高亮其父母、配偶、子女与孙辈，再次点击取消；图谱在打开时与季末结算完成后刷新，处理选项期间保持当前快照。</p>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="./dist/app.js?v=0.14.6"></script>
+  <script type="module" src="./dist/app.js?v=0.14.6-r1"></script>
 </body>
 </html>
