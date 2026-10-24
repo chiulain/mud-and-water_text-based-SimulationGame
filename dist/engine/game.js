@@ -543,9 +543,69 @@ export class MudWaterGame {
             person.weak = true;
         }
     }
-    kill(personId, reason, narrativeOverride = "", title = "死亡") {
+    relatedReactionList(relatives, maxNames = 2) {
+        const named = relatives.slice(0, maxNames).map((relative)=>`${relative.label}${relative.person.name}`).join("和");
+        return relatives.length > maxNames ? `${named}等人` : named;
+    }
+    siblingReactionLabel(sibling, deceased) {
+        if (sibling.age > deceased.age) return sibling.sex === "男" ? "哥哥" : "姐姐";
+        if (sibling.age < deceased.age) return sibling.sex === "男" ? "弟弟" : "妹妹";
+        return sibling.sex === "男" ? "兄弟" : "姐妹";
+    }
+    deathFamilyReaction(person, excludedRelativeIds) {
+        const living = this.alivePeople();
+        const eligible = (relative)=>relative !== null && relative.id !== person.id && !excludedRelativeIds.has(relative.id);
+        const father = this.person(person.fatherId);
+        const mother = this.person(person.motherId);
+        const parents = [];
+        if (eligible(father)) parents.push({
+            person: father,
+            label: "父亲"
+        });
+        if (eligible(mother)) parents.push({
+            person: mother,
+            label: "母亲"
+        });
+        const siblings = living.filter((relative)=>eligible(relative) && (person.fatherId !== null && relative.fatherId === person.fatherId || person.motherId !== null && relative.motherId === person.motherId));
+        const spouse = this.person(person.spouseId);
+        const visibleSpouse = eligible(spouse) ? spouse : null;
+        const children = living.filter((relative)=>eligible(relative) && relative.age >= 3 && (relative.fatherId === person.id || relative.motherId === person.id));
+        const sentences = [];
+        const firstSentence = [];
+        if (parents.length > 0) {
+            firstSentence.push(`${this.relatedReactionList(parents)}一直守在${person.name}留下的空位旁，谁也没有先离开`);
+        }
+        if (siblings.length > 0) {
+            const siblingNames = this.relatedReactionList(siblings.map((sibling)=>({
+                    person: sibling,
+                    label: this.siblingReactionLabel(sibling, person)
+                })));
+            firstSentence.push(parents.length > 0 ? `${siblingNames}把火添得更旺，始终没有先走` : `${siblingNames}把火添得更旺，替${person.name}留着原来的位置`);
+        }
+        if (firstSentence.length > 0) sentences.push(`${firstSentence.join("；")}。`);
+        const spouseLabel = visibleSpouse?.sex === "男" ? "丈夫" : "妻子";
+        if (visibleSpouse && children.length > 0) {
+            const childNames = this.relatedReactionList(children.map((child)=>({
+                    person: child,
+                    label: child.sex === "男" ? "儿子" : "女儿"
+                })));
+            sentences.push(`${spouseLabel}${visibleSpouse.name}搂紧${childNames}，没有让人看见自己发抖的手。`);
+        } else if (visibleSpouse) {
+            sentences.push(`${spouseLabel}${visibleSpouse.name}没有松开${person.name}的衣物，直到火光暗下去。`);
+        } else if (children.length > 0) {
+            const childNames = this.relatedReactionList(children.map((child)=>({
+                    person: child,
+                    label: child.sex === "男" ? "儿子" : "女儿"
+                })));
+            sentences.push(`${childNames}守着${person.name}原来的位置，久久没有离开。`);
+        }
+        return sentences.join("");
+    }
+    kill(personId, reason, narrativeOverride = "", title = "死亡", representedRelativeIds = []) {
         const person = this.state.people.find((entry)=>entry.id === personId);
         if (!person || person.status === "死亡") return;
+        const excludedRelativeIds = new Set(representedRelativeIds.filter((id)=>id !== null));
+        const familyReaction = this.deathFamilyReaction(person, excludedRelativeIds);
         const heldKeys = this.state.knowledge.filter((card)=>card.holderId === person.id && !card.lost).map((card)=>card.key);
         person.status = "死亡";
         person.health = 0;
@@ -588,7 +648,7 @@ export class MudWaterGame {
                 narrative += ` ${lost}失去传承。`;
             }
         }
-        this.log("settlement", title, narrative.trim(), "danger");
+        this.log("settlement", title, `${narrative.trim()}${familyReaction}`, "danger");
         if (this.population() === 0) {
             this.setEnding("最后一堆火·熄灭");
         }
@@ -3034,7 +3094,10 @@ export class MudWaterGame {
                 const fatherName = this.rosterName(person.fatherId);
                 const motherName = this.rosterName(person.motherId);
                 const narrative = `${person.name}没能挺过${this.seasonLabel}。${person.name}的父亲${fatherName}和母亲${motherName}抱着小小的${person.name}悲痛欲绝。`;
-                this.kill(person.id, "早夭", narrative, "早夭");
+                this.kill(person.id, "早夭", narrative, "早夭", [
+                    person.fatherId,
+                    person.motherId
+                ]);
             }
         }
         if (this.state.phase === "ended") return {
@@ -3181,9 +3244,11 @@ export class MudWaterGame {
             this.state.people.push(child);
             if (motherDied) {
                 const narrative = `${mother.name}在分娩时历经磨难，她很勇敢，可她终究没能熬过这一关，族人们沉默地守着篝火，她的配偶${father.name}已泣不成声。${mother.name}，死于难产，终年${formatAgeYears(mother.age)}岁。`;
-                this.kill(mother.id, `难产 d20=${difficult}`, narrative);
+                this.kill(mother.id, `难产 d20=${difficult}`, narrative, "死亡", [
+                    father.id
+                ]);
             }
-            this.log("settlement", `新生儿：${newName}`, motherDied ? `${father.name}为新生儿取名${newName}。` : `${mother.name}平安分娩，她和配偶${father.name}决定把孩子取名${newName}。`, motherDied ? "warning" : "normal");
+            this.log("settlement", `新生儿：${newName}`, motherDied ? `${father.name}为新生儿取名${newName}。` : `${mother.name}平安诞下${sex}婴，她和配偶${father.name}决定把孩子取名${newName}。`, motherDied ? "warning" : "normal");
             names.push(`${newName}${motherDied ? "（母亡）" : ""}`);
             motherIds.push(mother.id);
         }
