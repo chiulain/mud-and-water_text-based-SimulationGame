@@ -4,6 +4,7 @@
 网页版：https://mud-and-water-web.chiulainn.workers.dev/
 
 开局即可看到简单新手指引
+※只是文字模拟游戏，半架空，婚配/亲属关系等没有完全按照现代社会设定※
 
 遇到bug或者有需要修改的地方可以联系我 :)
 
