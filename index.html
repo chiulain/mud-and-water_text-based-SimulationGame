@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#22332e">
   <title>泥与水之间 · 网页版</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%2322312b'/%3E%3Ctext x='32' y='43' font-size='36' text-anchor='middle' fill='%23fffdf8'%3E泥%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./src/styles.css?v=0.14.6-r1">
+  <link rel="stylesheet" href="./src/styles.css?v=0.14.6-r2">
 </head>
 <body>
   <header class="topbar">
@@ -53,10 +53,16 @@
     </aside>
   </main>
 
-  <footer class="statusbar">
-    <span id="saveState">本地自动存档</span>
-    <span id="seedLabel"></span>
-    <span>v0.14.6 · TypeScript rules 1.0</span>
+  <footer class="statusbar" aria-label="作品声明与联系信息">
+    <p class="fiction-disclaimer">
+      <span><strong>虚构声明：</strong>本游戏为半架空虚构作品，故事中的时代、地理、制度及人物关系均为叙事设定，部分历史元素仅作艺术化借用。作品所呈现的社会结构、价值取向与人物互动不映射、不指涉任何现代社会属性或现实群体，亦不构成对现实制度、伦理关系或价值观念的表达与评价。</span>
+      <span class="fiction-contact">联系与反馈：<a href="mailto:chiulainn@gmail.com">chiulainn@gmail.com</a></span>
+    </p>
+    <div class="statusbar-meta">
+      <span id="saveState">本地自动存档</span>
+      <span id="seedLabel"></span>
+      <span>v0.14.6 · TypeScript rules 1.0</span>
+    </div>
   </footer>
 
   <dialog id="gameGuideDialog" class="dialog game-guide-dialog" aria-labelledby="gameGuideTitle" aria-describedby="gameGuideCopy">

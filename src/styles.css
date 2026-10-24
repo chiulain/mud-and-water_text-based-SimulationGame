@@ -415,13 +415,47 @@ select, input {
 .statusbar {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 8px;
+  flex-direction: column;
+  gap: 9px;
   width: min(1500px, 100%);
   margin: 0 auto;
   padding: 0 26px 24px;
   color: var(--muted);
   font: 11px "Microsoft YaHei", sans-serif;
+}
+.fiction-disclaimer {
+  display: grid;
+  gap: 4px;
+  max-width: 1120px;
+  padding-top: 12px;
+  border-top: 1px solid rgb(64 85 77 / 16%);
+  color: #5c6d65;
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+.fiction-disclaimer strong {
+  color: var(--ink-soft);
+  letter-spacing: .04em;
+}
+.fiction-contact {
+  color: var(--ink-soft);
+}
+.fiction-contact a {
+  color: var(--water-deep);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+.fiction-contact a:hover { color: var(--ink); }
+.fiction-contact a:focus-visible {
+  outline: 2px solid rgb(63 119 118 / 30%);
+  outline-offset: 2px;
+}
+.statusbar-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
 }
 .toast {
   position: fixed;
