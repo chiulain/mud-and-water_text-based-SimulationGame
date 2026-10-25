@@ -833,6 +833,9 @@ export class MudWaterGame {
             this.state.translatorId = this.pick(valid, "重抽族际中间人");
         }
     }
+    experientialLearningCopy(name, source, key) {
+        return `${name}切身经历了${source}，顿悟并融会贯通了${KNOWLEDGE_NAMES[key]}知识。`;
+    }
     learnFromEvent(key, source) {
         if (this.state.season.nonTeachingIncrements.includes(key)) return null;
         const card = this.knowledge(key);
@@ -841,12 +844,14 @@ export class MudWaterGame {
                 index
             })).filter((entry)=>entry.id !== null && this.person(entry.id) !== null);
         if (heirs.length === 0) return null;
-        heirs.sort((a, b)=>card.heirLevels[a.index] - card.heirLevels[b.index]);
-        const heir = heirs[0];
-        if (card.heirLevels[heir.index] >= 3) return null;
-        card.heirLevels[heir.index] += 1;
+        const learners = heirs.filter((entry)=>card.heirLevels[entry.index] < 3);
+        if (learners.length === 0) return null;
+        for (const learner of learners){
+            card.heirLevels[learner.index] = Math.min(3, card.heirLevels[learner.index] + 1);
+        }
         this.state.season.nonTeachingIncrements.push(key);
-        return `${this.peopleName(heir.id)}在${source}后把${KNOWLEDGE_NAMES[key]}提升到 ${card.heirLevels[heir.index]}。`;
+        const names = learners.map((learner)=>this.peopleName(learner.id)).join("与");
+        return this.experientialLearningCopy(names, source, key);
     }
     learnFromRelatedAction(keys, actor, source) {
         for (const key of keys){
@@ -927,13 +932,13 @@ export class MudWaterGame {
             ];
             this.fillKnowledgeHeirs(card);
             this.state.season.nonTeachingIncrements.push(card.key);
-            return `${reason}使失传的${KNOWLEDGE_NAMES[card.key]}以脆弱 1 由${newcomer.name}临时持有。`;
+            return `${this.experientialLearningCopy(newcomer.name, reason, card.key)}这份知识因此暂由${newcomer.name}持有，熟练度为 1。`;
         }
         const heirIndex = card.heirLevels[0] <= card.heirLevels[1] ? 0 : 1;
         if (card.heirIds[heirIndex] === null || card.heirLevels[heirIndex] >= 3) return null;
         card.heirLevels[heirIndex] += 1;
         this.state.season.nonTeachingIncrements.push(card.key);
-        return `${reason}强化最薄弱的${KNOWLEDGE_NAMES[card.key]}：${this.peopleName(card.heirIds[heirIndex])}升至 ${card.heirLevels[heirIndex]}。`;
+        return this.experientialLearningCopy(this.peopleName(card.heirIds[heirIndex]), reason, card.key);
     }
     isAdjacent(a, b) {
         return Math.abs(CAMP_ORDER.indexOf(a) - CAMP_ORDER.indexOf(b)) === 1;
@@ -1298,6 +1303,7 @@ export class MudWaterGame {
     }
     resolveEvent(season, card, name) {
         const mods = this.state.season.event.modifiers;
+        let learning = "";
         if (season === "spring") {
             if (card === 1) {
                 if (WATER_CAMPS.includes(this.state.camp)) {
@@ -1500,6 +1506,7 @@ export class MudWaterGame {
                     "河湾营地",
                     "芦苇湖沼"
                 ].includes(this.state.camp)) mods.fishingBonus += 1;
+                learning = this.learnFromEvent("water", "鱼群缺氧") ?? "";
             } else if (card === 8) {
                 if (this.state.camp === "河口浅滩") {
                     this.startEventDecision("summer-estuary-surge", "河口咸潮", "留在河口会同时失去 1 食物和 1 住所；也可以支付迁徙费用前往湖沼。", [
@@ -1520,6 +1527,7 @@ export class MudWaterGame {
                     this.addResource("material", 1);
                     this.markCrossgroupSuccess();
                 } else this.addResource("material", 1);
+                learning = this.learnFromEvent("story", "外来者避雨") ?? "";
             } else if (card === 10) {
                 if (this.fullKnowledge("fire")) this.addResource("fuel", -1);
                 else {
@@ -1527,9 +1535,11 @@ export class MudWaterGame {
                     this.addResource("material", -1);
                 }
                 if (this.state.camp === "橡树林坡") this.addResource("food", -1);
-                this.learnFromEvent("fire", "雷击起火");
+                learning = this.learnFromEvent("fire", "雷击起火") ?? "";
+                this.finishEvent(undefined, learning ?? "");
+                return;
             }
-            this.finishEvent();
+            this.finishEvent(undefined, learning);
             return;
         }
         if (season === "autumn") {
@@ -1601,7 +1611,9 @@ export class MudWaterGame {
                 this.addResource("fuel", -1);
                 if (this.effectiveShelter() + this.state.resources.clothes <= 2) this.groupHurt(1, "早霜");
                 if (this.fullKnowledge("plant")) this.addResource("food", 1);
-                this.learnFromEvent("plant", "早霜");
+                learning = this.learnFromEvent("plant", "早霜") ?? "";
+                this.finishEvent(undefined, learning);
+                return;
             }
             this.finishEvent();
             return;
@@ -1663,6 +1675,7 @@ export class MudWaterGame {
                     } else {
                         this.addResource("care", 1);
                     }
+                    learning = this.learnFromEvent("care", "孩子发烧") ?? "";
                 }
             } else if (card === 5) {
                 if (this.state.camp === "河口浅滩") {
@@ -1712,7 +1725,9 @@ export class MudWaterGame {
                     }
                     this.addResource("shelter", -1);
                 }
-                this.learnFromEvent("fire", "火塘熄灭");
+                learning = this.learnFromEvent("fire", "火塘熄灭") ?? "";
+                this.finishEvent(undefined, learning);
+                return;
             } else if (card === 9) {
                 const canAvoid = this.state.resources.food >= 1 && Boolean(this.person(this.state.caregiverId) || this.person(this.state.translatorId));
                 if (canAvoid) {
@@ -1734,7 +1749,7 @@ export class MudWaterGame {
                 ]);
                 return;
             }
-            this.finishEvent();
+            this.finishEvent(undefined, learning);
         }
     }
     offerStorageDamage(reason) {
@@ -1781,6 +1796,7 @@ export class MudWaterGame {
     resolveEventChoice(optionId) {
         const token = this.state.season.event?.choiceToken;
         let message = "";
+        let learning = "";
         if (token === "spring-flood" || token === "river-collapse") {
             if (optionId === "lose-food") {
                 this.damageResource("food", 1, this.state.season.event?.name ?? "水灾");
@@ -1882,7 +1898,7 @@ export class MudWaterGame {
                 const newcomer = this.addNewcomer(15, "盟约破裂");
                 this.state.allianceNewcomerIds.push(newcomer.id);
                 this.markCrossgroupSuccess();
-                this.reinforceWeakestKnowledge("人员迁入");
+                learning = this.reinforceWeakestKnowledge("人员迁入") ?? "";
             }
             message = "盟约破裂已经处理。";
         } else if (token === "fuel-shortage") {
@@ -1908,15 +1924,15 @@ export class MudWaterGame {
             if (optionId === "give-food") {
                 this.addResource("food", -1);
                 this.addResource("network", 1);
-                const learned = this.reinforceWeakestKnowledge("邻族求援");
-                if (learned) message = learned;
+                learning = this.reinforceWeakestKnowledge("邻族求援") ?? "";
+                if (learning) message = learning;
                 this.markCrossgroupSuccess();
             } else {
                 this.addResource("cohesion", -1);
             }
             message ||= "邻族求援已经处理。";
         }
-        this.finishEvent();
+        this.finishEvent(undefined, learning);
         return {
             ok: true,
             message
@@ -2707,7 +2723,8 @@ export class MudWaterGame {
             }
             if (this.fullKnowledge("water")) {
                 this.addResource("material", -1);
-                this.recordUnexpected();
+                const learning = this.learnFromEvent("water", "独木舟翻覆");
+                this.recordUnexpected(learning ?? "");
                 return;
             }
             this.decision("unexpected", "独木舟翻覆", "选择失去食物或材料，并有一人健康 -1。", [
@@ -2758,7 +2775,8 @@ export class MudWaterGame {
                 const adult = this.randomPerson("成人", "无儿童时走失替代");
                 if (adult) this.hurt(adult, 1, "孩子走失替代");
             }
-            this.recordUnexpected();
+            const learning = child ? this.learnFromEvent("story", "孩子走失") : null;
+            this.recordUnexpected(learning ?? "");
             return;
         }
         if (card === 7) {
@@ -2774,7 +2792,8 @@ export class MudWaterGame {
                     this.hurt(victim, 1, "蛇咬后缺住所衣物");
                 }
             }
-            this.recordUnexpected();
+            const learning = victim ? this.learnFromEvent("care", "蛇咬与感染") : null;
+            this.recordUnexpected(learning ?? "");
             return;
         }
         if (card === 8) {
@@ -2832,7 +2851,11 @@ export class MudWaterGame {
             else this.addResource("food", -1);
             message = "选定储藏损失类型";
         }
-        this.recordUnexpected(message);
+        const learning = card === 4 ? this.learnFromEvent("water", "独木舟翻覆") : null;
+        this.recordUnexpected([
+            message,
+            learning
+        ].filter(Boolean).join("；"));
         return {
             ok: true,
             message
